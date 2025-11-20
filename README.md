@@ -1,22 +1,36 @@
-# Custom Project Templates in SageMaker
+# Custom Project Templates in Amazon SageMaker AI Projects
 
-This repository contains an example SageMaker Project template. Each folder in this repo contains a custom project template with details on what that template achieves and how to set it up. The generic instructions are shown below.
+This repository contains custom [SageMaker AI Project](https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-projects-whatis.html) templates. You can be deploy custom templates with two different methods:
+- **Amazon S3**: Deploy custom templates directly from Amazon S3 buckets ⭐ $${\color{red}(Recommended)}$$
+- **AWS Service Catalog**: Deploy custom templates through AWS Service Catalog.
 
-## Custom Projects
-* [MLOps template for model training and deployment with GitLab and GitLab Pipelines](../../tree/main/mlops-template-gitlab)
-* [MLOps template for model training and deployment using encrypted buckets](../../tree/main/encrypted-buckets)
-* [MLOps template for model training and deployment using multiple repo branches](../../tree/main/multi-branch-mlops-train)
-* [Asynchronous Inference Endpoint Deployment Pipeline](../../tree/main/asynchronous-inference-endpoint)
-* [Batch Inference Endpoint Deployment Pipeline](../../tree/main/batch-inference)
-* [Multi Model Endpoint Deployment Pipeline](../../tree/main/multi-model-endpoint)
-* [Amazon SageMaker Project with Terraform and GitHub](../../tree/main/sm-project-tf-github)
-* [Amazon SageMaker Project with Terraform and GitLab](../../tree/main/sm-project-tf-gitlab)
+> [!Important]
+> You can find instructions about SageMaker AI projects based on S3 templates provisioning method in this repository's folder - [s3_templates](./s3_templates/README.md) along with S3 based custom templates samples.
 
+Each other folder contains a custom project template with details on what it achieves and setup instructions.
 
-## Adding the templates to SageMaker Studio Studio
-In order to add your custom SageMaker Projects into SageMaker studio and deploy them, you will need to complete 3 steps:
+## Getting Started
 
-### Step 1: Create a Service Catalog Portfolio (only needs to be done the first time)
+You have two deployment options to deploy the custom MLOps templates using SageMaker AI Projects:
+- **SageMaker AI projects based on S3 templates** Allows you to provision custom templates directly from S3 buckets. See [Method 1](#method-1-provision-via-amazon-s3--recommended) for details. 
+- **Provision via Service Catalog** Provisioning custom templates through AWS Service Catalog. See [Method 2](#method-2-provisioning-via-service-catalog) for details. 
+
+## Provisioning Methods supported in Amazon SageMaker AI Projects
+
+### Method 1: Provision via Amazon S3 (⭐ Recommended)
+
+The SageMaker AI projects based on S3 templates is a [newly released support](https://aws.amazon.com/about-aws/whats-new/2025/10/amazon-sagemaker-ai-projects-custom-template-s3-provisioning/) in SageMaker AI projects allowing for provisioning custom machine learning (ML) project templates directly from Amazon S3. 
+
+![](images/custom_temp_s3.png)
+
+> [!CAUTION]
+> Proceed to this repository's folder - [s3_templates](./s3_templates/README.md) for information on SageMaker AI projects based on S3 templates provisioning and S3 based custom templates samples.
+
+### Method 2: Provisioning via AWS Service Catalog
+
+Provisioning custom templates through AWS Service Catalog.
+
+#### Step 1: Create a Service Catalog Portfolio (only needs to be done the first time)
 
 1. Download the __sagemaker-projects-portfolio.yaml__ CloudFormation template from the root of this repo to your local machine.
 1. Open the CloudFormation console at https://console.aws.amazon.com/cloudformation
@@ -62,5 +76,3 @@ In order to add your custom SageMaker Projects into SageMaker studio and deploy 
     ![](images/sm-projects-listing.png)
 
 1. Enter a name and optional description for the project. If additional parameters or tags are required, enter the appropriate values, and choose Create project.
-
-You have now successfully created an MLOps template and a SageMaker Project using the custom template. Refer to `encrypted-buckets` for a sample implementation. 
