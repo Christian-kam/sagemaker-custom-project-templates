@@ -251,10 +251,18 @@ aws sagemaker add-tags \
 ### Method 1: Using SageMaker Studio
 
 1. Open SageMaker Studio
-2. Navigate to **Deployments** > **Projects** > **Create project**
-3. Choose **Organization templates** > **S3 Templates**
-4. Select **MLOps GitHub Actions** template
-5. Fill in the parameters and create
+2. Navigate to **More** > **Projects** > **Create project**
+3. Choose **Organization templates** > **S3 Templates** . Select **MLOps GitHub Actions** template as shown below:
+   ![](./images/studio_project.png)
+4. Fill in the parameters and create
+   ![](./images/create_project.png)
+
+   ⚠️ Important: Use the AmazonSageMakerProjectsLaunchRole ARN, not your SageMaker Execution Role.
+
+The AmazonSageMakerProjectsLaunchRole is a provisioning role that acts as an intermediary during project creation. This role contains all the permissions needed to create your project's infrastructure, including IAM roles, S3 buckets, CodePipeline, and other AWS resources. By using this dedicated launch role, ML engineers and data scientists can create projects without requiring broader permissions in their own accounts. Their personal SageMaker Execution Role remains limited in scope—they only need permission to assume the Launch Role itself.
+
+This separation of responsibilities is important for maintaining security. Without Launch Roles, every ML practitioner would need extensive IAM permissions to create CodePipeline, CodeBuild projects, S3 buckets, and other AWS resources directly. With Launch Roles, they only need permission to assume a pre-configured role that handles the provisioning on their behalf, keeping their personal permissions minimal and secure.
+
 
 ### Method 2: Python SDK
 
