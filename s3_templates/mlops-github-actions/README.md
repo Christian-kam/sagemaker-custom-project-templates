@@ -22,6 +22,14 @@ The template creates the following AWS resources:
 
 ## Prerequisites
 
+### 0. GitHub Repository Naming Requirement
+
+Your GitHub repository name **must start with `sagemaker-`** (e.g., `sagemaker-mlops-project`).
+
+This is required for the **AmazonSageMakerProjectsLaunchRole** (more details about this role in [Step 4](#4-required-iam-roles-and-policies-only-once-and-used-for-all-custom-templates)) to associate your GitHub repository with the SageMaker project.
+
+> 💡 **Recommendation:** Create a new repository specifically for this project.
+
 ### 1. AWS CodeConnection Setup
 Create a CodeConnection to your GitHub account following [this guide](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html).
 
@@ -36,6 +44,8 @@ key=sagemaker value=true
 ```
 
 ![](./images/code-connection.png)
+
+In the above example, `aEXAMPLE-8aad-4d5d-8878-dfcab0bc441f` is the unique ID for this connection. We use this ID when we create our SageMaker project later in this example.
 
 ### 2. GitHub Personal Access Token
 Create a GitHub personal access token with access to **Contents** and **Actions** permissions, following the instructions on [Managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
@@ -72,8 +82,8 @@ aws secretsmanager create-secret \
 ```
 
 ### 3. IAM User for GitHub Actions
+To allow GitHub Actions to deploy SageMaker endpoints in your AWS environment, you need to create an [AWS Identity and Access Management](https://aws.amazon.com/iam/) (IAM) user and grant it the necessary permissions. For instructions and best practices, refer to [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html). 
 Create an IAM user with the policy from [`iam/GithubActionsMLOpsExecutionPolicy.json`](./iam/GithubActionsMLOpsExecutionPolicy.json) and generate access keys for GitHub Secrets.
-
 ```bash
 # Create IAM user
 aws iam create-user --user-name sagemaker-github-actions-user
@@ -90,17 +100,11 @@ aws iam attach-user-policy \
 aws iam create-access-key --user-name sagemaker-github-actions-user
 ```
 
-
+Take note of the generated `access key` and `secret access key`, as you will need it in the subsequent step when configuring your GitHub secrets.
 
 ### 4. Required IAM Roles and Policies (only once and used for all custom templates)
 
-SageMaker Projects require a set of IAM roles that fall under two categories:
-
-* `Use Roles` – Used within the template by each resource for the required operations. For each operation in the product template, the Use Role is assumed by the respective AWS Service Principal.
-* `Launch Role` – Used to define permissions to provision the underlying resources specified by the template. This allows developers to create projects using templates without needing their SageMaker Execution Role to have all the policies needed. SageMaker Projects uses the launch role while creating the project so that the developers using the project can have their roles limited to the specific policies they need.
-
-These are roles and policies assumed by the underlying services, e.g., AWS CodePipelines, AWS CodeBuild, AWS Lambda, to allow them to perform the actions needed.
-Here are the list of service roles defined by this template:
+These are service-specific execution roles that AWS services assume to perform their designated tasks within your MLOps pipeline:
 
 - **AmazonSageMakerProjectsCloudformationRole** - Role for CloudFormation to manage SageMaker resources
 - **AmazonSageMakerProjectsCodeBuildRole** - Role for CodeBuild projects to build and push container images
@@ -109,8 +113,21 @@ Here are the list of service roles defined by this template:
 - **AmazonSageMakerProjectsLambdaRole** - Role for Lambda functions used in MLOps workflows
 - **AmazonSageMakerProjectsUseRole** - General-purpose role for various SageMaker project services
 
-Furthermore, it defines a "Launch Role" (**AmazonSageMakerProjectsLaunchRole**) that the SageMaker Execution role can assume.
-In this way, the Launch Role encapsulates all necessary permissions without the need to extend the scope of the SageMaker Execution role directly.
+Each AWS service (CodePipeline, CodeBuild, etc.) assumes its corresponding Use Role to perform only the actions it needs, following the principle of least 
+privilege.
+
+#### Launch Role
+
+**AmazonSageMakerProjectsLaunchRole** is a provisioning role that acts as an intermediary during project creation:
+
+- **Purpose**: Contains all permissions needed to create the project's infrastructure (IAM roles, S3 buckets, CodePipeline, etc.)
+- **Benefit**: ML engineers and data scientists can create projects without having broader permissions
+- **Security**: Their personal SageMaker Execution Role remains limited - they just need permission to assume the Launch Role itself
+
+#### Why This Separation Matters
+
+Without Launch Roles, every ML practitioner would need extensive IAM permissions to create CodePipeline, CodeBuild projects, S3 buckets, and other AWS resources. 
+With Launch Roles, they only need permission to assume a pre-configured role that handles the provisioning, keeping their personal permissions minimal and secure.
 
 Lets identify the SageMaker Execution role of the SageMaker user profile.
 We intend to grant him permissions to deploy the provisioned custom template.
@@ -134,7 +151,7 @@ This creates the necessary launch and execution roles that SageMaker projects re
 ### 4a. Additional Permissions
 **SageMaker Execution Role**
 
-Permission to `iam:PassRole` to `AmazonSageMakerProjectsLaunchRole`**
+Permission to `iam:PassRole` to `AmazonSageMakerProjectsLaunchRole`
 
 ```bash
 cat > iam/pass-role-policy.json << EOF
@@ -177,6 +194,7 @@ aws iam put-role-policy \
 
 - **[sagemaker-projects-roles-and-policies.yaml](./iam/sagemaker-projects-roles-and-policies.yaml)** - Contains the necessary IAM roles and policies required by these templates
 - **[s3-tagging-policy.json](./iam/s3-tagging-policy.json)** - Additional S3 GetObjectTagging policy for SageMaker buckets
+- **[cfn-stack-sm-projects.json](./iam/cfn-stack-sm-projects.json)** - CloudFormation permissions policy allowing SageMaker execution role to create and manage CloudFormation stacks for SageMaker AI Projects
 
 
 ### 5. Deploy Lambda Function
@@ -206,13 +224,19 @@ your-repo/
 └── ... (other seedcode files)
 ```
 
-#### GitHub Secrets
-Add these secrets to your GitHub repository:
-- `AWS_ACCESS_KEY_ID`: IAM user access key
-- `AWS_SECRET_ACCESS_KEY`: IAM user secret key
+#### GitHub Secrets containing the IAM user access keys
+In this step, we store the access key details of the user created in [step 3](#3-iam-user-for-github-actions) in our [GitHub repository secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets#creating-secrets-for-a-repository).
+Add these secrets to your GitHub repository as follows:
+1. On the GitHub website, navigate to your repository and choose **Settings**.
+2. In the **security** section of the sidebar, select **Secrets and Variables**, then click **Actions**.
+3. Click the **Secrets** tab and choose **New Repository Secret**.
+4. In the Name field, type `AWS_ACCESS_KEY_ID`
+5. In the Secret field, enter the access key ID associated with the IAM user you created in [step 3](#3-iam-user-for-github-actions).
+6. Click Add secret.
+7. Repeat the same procedure for `AWS_SECRET_ACCESS_KEY`
 
 #### Create GitHub Environment
-
+To create a manual approval step in our deployment pipelines, we use a [GitHub environment](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments). Complete the following steps:
 1. Go to your repository **Settings** > **Environments**
 2. Create environment named `production`
 3. Add required reviewers for deployment approval
@@ -253,15 +277,22 @@ aws sagemaker add-tags \
 1. Open SageMaker Studio
 2. Navigate to **More** > **Projects** > **Create project**
 3. Choose **Organization templates** > **S3 Templates** . Select **MLOps GitHub Actions** template as shown below:
-   ![](./images/studio_project.png)
-4. Fill in the parameters and create
    ![](./images/create_project.png)
 
-   ⚠️ Important: Use the AmazonSageMakerProjectsLaunchRole ARN, not your SageMaker Execution Role.
+To launch the ModelOps project, you must enter project-specific details including the `Role ARN` field. This field should contain the `AmazonSageMakerProjectsLaunchRole ARN` created during setup, as shown in the following image.
 
-The AmazonSageMakerProjectsLaunchRole is a provisioning role that acts as an intermediary during project creation. This role contains all the permissions needed to create your project's infrastructure, including IAM roles, S3 buckets, CodePipeline, and other AWS resources. By using this dedicated launch role, ML engineers and data scientists can create projects without requiring broader permissions in their own accounts. Their personal SageMaker Execution Role remains limited in scope—they only need permission to assume the Launch Role itself.
+As a security best practice, use the `AmazonSageMakerProjectsLaunchRole Amazon Resource Name (ARN)`, not your SageMaker execution role.
 
-This separation of responsibilities is important for maintaining security. Without Launch Roles, every ML practitioner would need extensive IAM permissions to create CodePipeline, CodeBuild projects, S3 buckets, and other AWS resources directly. With Launch Roles, they only need permission to assume a pre-configured role that handles the provisioning on their behalf, keeping their personal permissions minimal and secure.
+The AmazonSageMakerProjectsLaunchRole is a provisioning role that acts as an intermediary during the ModelOps project creation. This role contains all the permissions needed to create your project’s infrastructure, including [IAM](https://aws.amazon.com/iam/) roles, S3 buckets, [AWS CodePipeline](https://aws.amazon.com/fr/codepipeline/), and other AWS resources. By using this dedicated launch role, ML engineers and data scientists can create ModelOps projects without requiring broader permissions in their own accounts. Their personal SageMaker execution role remains limited in scope—they only need permission to assume the launch role itself.
+
+This separation of responsibilities is important for maintaining security. Without launch roles, every ML practitioner would need extensive IAM permissions to create code pipelines, [AWS CodeBuild](https://aws.amazon.com/codebuild) projects, S3 buckets, and other AWS resources directly. With launch roles, they only need permission to assume a pre-configured role that handles the provisioning on their behalf, keeping their personal permissions minimal and secure.
+
+5. Fill in the project configuration details and choose Next. T
+   ![](./images/project_details.png)
+   
+The template will then create two automated ModelOps workflows—one for model building and one for model deployment—that work together to provide CI/CD for your ML models. 
+
+   ![](./images/sagemaker_pipeline.png)
 
 
 ### Method 2: Python SDK
@@ -322,6 +353,13 @@ After creating the project:
    - Verify the build workflow runs automatically
    - Approve a model in SageMaker Model Registry
    - Verify the deployment workflow triggers
+  
+## Clean up
+After deployment, you will incur costs for the deployed resources. If you don’t intend to continue using the setup, delete the ModelOps project resources to avoid unnecessary charges.
+
+To destroy the project, open SageMaker Studio and choose **More** in the navigation pane and select **Projects**. Choose the project you want to delete, choose the vertical ellipsis above the upper-right corner of the projects list and choose **Delete**. Review the information in the Delete project dialog box and select **Yes, delete the project** to confirm. After deletion, verify that your project no longer appears in the projects list.
+
+In addition to deleting a project, which will remove and deprovision the SageMaker AI Project, you also need to manually delete the following components if they’re no longer needed: Git repositories, pipelines, model groups, and endpoints.
 
 ## Troubleshooting
 
