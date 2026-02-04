@@ -202,9 +202,10 @@ aws iam put-role-policy \
 This lambda will trigger the deploy GitHub action on model registry approval
 
 ```bash
+# <BUCKET> example <sagemaker-*>
 # Make the script executable and run it
 chmod +x scripts/deploy-lambda.sh
-./scripts/deploy-lambda.sh <your-lambda-s3-bucket> <REGION>
+./scripts/deploy-lambda.sh <BUCKET> <REGION> 
 ```
 
 ### 6. GitHub Repository Setup
@@ -332,7 +333,7 @@ response = sagemaker_client.create_project(
 | `CodestarConnectionUniqueId` | CodeConnection ID | Yes | - |
 | `GitHubTokenSecretName` | Secrets Manager secret name | Yes | - |
 | `GitHubWorkflowNameForDeployment` | Deployment workflow filename | Yes | deploy.yml |
-| `LambdaS3Bucket` | S3 bucket with Lambda function | Yes | sagemaker-mlops-templates |
+| `LambdaS3Bucket` | S3 bucket with Lambda function | Yes | - |
 | `LambdaS3Key` | Lambda function S3 key | Yes | lambda-github-workflow-trigger.zip |
 
 ## Post-Deployment Configuration
