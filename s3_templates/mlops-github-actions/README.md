@@ -277,7 +277,7 @@ aws sagemaker add-tags \
 1. Open SageMaker Studio
 2. Navigate to **More** > **Projects** > **Create project**
 3. Choose **Organization templates** > **S3 Templates** . Select **MLOps GitHub Actions** template as shown below:
-   ![](./images/create_project.png)
+   ![](./images/modelops_project.png)
 
 To launch the ModelOps project, you must enter project-specific details including the `Role ARN` field. This field should contain the `AmazonSageMakerProjectsLaunchRole ARN` created during setup, as shown in the following image.
 
