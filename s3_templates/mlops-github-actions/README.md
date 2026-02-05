@@ -130,10 +130,10 @@ Without Launch Roles, every ML practitioner would need extensive IAM permissions
 With Launch Roles, they only need permission to assume a pre-configured role that handles the provisioning, keeping their personal permissions minimal and secure.
 
 Lets identify the SageMaker Execution role of the SageMaker user profile.
-We intend to grant him permissions to deploy the provisioned custom template.
+We intend to grant him permissions to deploy the provisioned custom template. Make sure to `<DOMAIN-ID>` with your actual SageMaker AI domain
 
 ```bash
-export SAGEMAKER_EXECUTION_ROLE_ARN=$(aws sagemaker describe-domain --domain-id $DOMAIN_ID --query 'DefaultUserSettings.ExecutionRole' --output text)
+export SAGEMAKER_EXECUTION_ROLE_ARN=$(aws sagemaker describe-domain --domain-id <DOMAIN_ID> --query 'DefaultUserSettings.ExecutionRole' --output text)
 ```
 
 ```bash
