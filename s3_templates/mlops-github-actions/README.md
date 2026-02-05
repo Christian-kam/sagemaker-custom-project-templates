@@ -310,7 +310,7 @@ aws s3 cp template.yaml s3://$BUCKET_NAME/templates/mlops-github-actions.yaml
 ```bash
 aws s3api put-object-tagging \
     --bucket $BUCKET_NAME \
-    --key mlops-github-actions/template.yaml \
+    --key templates/mlops-github-actions.yaml \
     --tagging 'TagSet=[{Key=sagemaker:studio-visibility,Value=true}]'
 ```
 ![](./images/s3-tag.png)
