@@ -1,6 +1,6 @@
-# MLOps using Amazon SageMaker and GitHub Actions (S3-Based Template)
+# ModelOps using Amazon SageMaker and GitHub Actions (S3-Based Template)
 
-This is an S3-based SageMaker project template that implements MLOps using Amazon SageMaker and GitHub Actions. This template has been migrated from the original Service Catalog-based approach to the new recommended S3-based deployment method.
+This is an S3-based SageMaker project template that implements ModelOps using Amazon SageMaker and GitHub Actions. This template has been migrated from the original Service Catalog-based approach to the new recommended S3-based deployment method.
 
 ## Overview
 
@@ -33,7 +33,7 @@ export DOMAIN_ID="<your sagemaker domain>"
 
 ### 0. GitHub Repository Naming Requirement
 
-Your GitHub repository name **must start with `sagemaker-`** (e.g., `sagemaker-mlops-project`).
+Your GitHub repository name **must start with `sagemaker-`** (e.g., `sagemaker-modelops-project`).
 
 This is required for the **AmazonSageMakerProjectsLaunchRole** (more details about this role in [Step 4](#4-required-iam-roles-and-policies-only-once-and-used-for-all-custom-templates)) to associate your GitHub repository with the SageMaker project.
 
@@ -63,7 +63,7 @@ Create a GitHub personal access token with access to **Contents** and **Actions*
 
 **[Fine-grained Personal Access Token (Recommended)](https://github.com/settings/personal-access-tokens):**
 * Click "Generate new token" → "Fine-grained token"
-* Repository access: Select "Only select repositories" → Choose sagemaker-ai-mlops-custom-template #or whatever your repo is
+* Repository access: Select "Only select repositories" → Choose sagemaker-ai-modelops-custom-template #or whatever your repo is
 * Permissions:
     * Repository permissions:
         * ✅ Actions: Read and write
@@ -74,7 +74,7 @@ Create a GitHub personal access token with access to **Contents** and **Actions*
 
 **[Classic Personal Access Token](https://github.com/settings/tokens):**
 * Click "Generate new token" → "Generate new token (classic)"
-* Give it a descriptive name:SageMaker MLOps Lambda
+* Give it a descriptive name:SageMaker ModelOps Lambda
 * Select these scopes:
     * ✅repo(Full control of private repositories) - Required
     * ✅workflow(Update GitHub Action workflows) - Required
@@ -85,7 +85,7 @@ Create a GitHub personal access token with access to **Contents** and **Actions*
 ```bash
 aws secretsmanager create-secret \
     --name sagemaker-github-token \
-    --description "GitHub token for SageMaker MLOps" \
+    --description "GitHub token for SageMaker ModelOps" \
     --secret-string '{"token":"your-github-token-here"}'
 ```
 
@@ -115,13 +115,13 @@ Take note of the generated `access key` and `secret access key`, as you will nee
 
 ### 4. Required IAM Roles and Policies (only once and used for all custom templates)
 
-These are service-specific execution roles that AWS services assume to perform their designated tasks within your MLOps pipeline:
+These are service-specific execution roles that AWS services assume to perform their designated tasks within your ModelOps pipeline:
 
 - **AmazonSageMakerProjectsCloudformationRole** - Role for CloudFormation to manage SageMaker resources
 - **AmazonSageMakerProjectsCodeBuildRole** - Role for CodeBuild projects to build and push container images
 - **AmazonSageMakerProjectsCodePipelineRole** - Role for CodePipeline to orchestrate CI/CD workflows
 - **AmazonSageMakerProjectsExecutionRole** - Role for SageMaker training and inference jobs
-- **AmazonSageMakerProjectsLambdaRole** - Role for Lambda functions used in MLOps workflows
+- **AmazonSageMakerProjectsLambdaRole** - Role for Lambda functions used in ModelOps workflows
 - **AmazonSageMakerProjectsUseRole** - General-purpose role for various SageMaker project services
 
 Each AWS service (CodePipeline, CodeBuild, etc.) assumes its corresponding Use Role to perform only the actions it needs, following the principle of least 
@@ -372,8 +372,8 @@ import boto3
 sagemaker_client = boto3.client('sagemaker', region_name='us-west-2')
 
 response = sagemaker_client.create_project(
-    ProjectName='mlops-github-actions-project',
-    ProjectDescription='MLOps project using SageMaker and GitHub Actions',
+    ProjectName='modelOps-github-actions-project',
+    ProjectDescription='ModelOps project using SageMaker and GitHub Actions',
     TemplateProviders=[{
         'CfnTemplateProvider': {
             'TemplateName': 'MLOpsGitHubActions',
