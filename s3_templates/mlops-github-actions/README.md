@@ -28,7 +28,7 @@ Set these environment variables to make the following commands reusable and easi
 export AWS_REGION=$(aws configure get region)    
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 export BUCKET_NAME="sagemaker-projects-templates-${AWS_ACCOUNT_ID}-${AWS_REGION}"
-export 
+export DOMAIN_ID="<your sagemaker domain>"
 ```
 
 ### 0. GitHub Repository Naming Requirement
