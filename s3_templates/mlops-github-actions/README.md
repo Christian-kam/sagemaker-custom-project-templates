@@ -253,6 +253,8 @@ Apply the CORS policy:
 aws s3api put-bucket-cors --bucket $BUCKET_NAME --cors-configuration file://cors-policy.json
 ```
 
+> 💡 **Tip:** you can also let SageMaker AI apply the CORS coffiguration to the bucket for you see **Configure SageMaker Domain** in [S3 Upload and Tagging](#s3-upload-and-tagging))
+
 ### 6. Deploy Lambda Function
 
 This lambda will trigger the deploy GitHub action on model registry approval
@@ -321,6 +323,9 @@ aws sagemaker add-tags --resource-arn arn:aws:sagemaker:$AWS_REGION:$AWS_ACCOUNT
 ```
 
 ![](./images/domain-tag.png)
+
+4. **Let SageMaker add CORS to your bucket** (optional if you did it in step [5](#configure-cors-policy)
+![](./images/cors.png)
 
 ## Create the project with these template Parameters
 
