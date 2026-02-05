@@ -317,9 +317,7 @@ aws s3api put-object-tagging \
 
 3. **Configure SageMaker Domain:**
 ```bash
-aws sagemaker add-tags \
-    --resource-arn arn:aws:sagemaker:$AWS_REGION:$ACCOUNT_ID:domain/$DOMAIN_ID \
-    --tags Key=sagemaker:projectS3TemplatesLocation,Value=s3://$BUCKET_NAME/templates/
+aws sagemaker add-tags --resource-arn arn:aws:sagemaker:$AWS_REGION:$AWS_ACCOUNT_ID:domain/$DOMAIN_ID --tags Key=sagemaker:projectS3TemplatesLocation,Value=s3://$BUCKET_NAME/templates/
 ```
 
 ![](./images/domain-tag.png)
