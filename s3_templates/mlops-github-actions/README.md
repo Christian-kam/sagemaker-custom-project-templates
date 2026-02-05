@@ -267,7 +267,7 @@ chmod +x scripts/deploy-lambda.sh
 ### 7. GitHub Repository Setup
 
 #### Repository Structure
-Copy the contents of the `seedcode/` directory to the root of your GitHub repository:
+Copy the contents of the `seedcode/` directory to the root of your GitHub repository, inluding `.github/workflows` (see the following screenshot):
 ```
 your-repo/
 ├── .github/
@@ -280,6 +280,7 @@ your-repo/
 ├── deploy_stack.py
 └── ... (other seedcode files)
 ```
+![](./images/workflow.png)
 
 #### GitHub Secrets containing the IAM user access keys
 In this step, we store the access key details of the user created in [step 3](#3-iam-user-for-github-actions) in our [GitHub repository secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets#creating-secrets-for-a-repository).
