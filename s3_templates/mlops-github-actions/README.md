@@ -196,8 +196,61 @@ aws iam put-role-policy \
 - **[s3-tagging-policy.json](./iam/s3-tagging-policy.json)** - Additional S3 GetObjectTagging policy for SageMaker buckets
 - **[cfn-stack-sm-projects.json](./iam/cfn-stack-sm-projects.json)** - CloudFormation permissions policy allowing SageMaker execution role to create and manage CloudFormation stacks for SageMaker AI Projects
 
+### 5. Create S3 Bucket
 
-### 5. Deploy Lambda Function
+Set these environment variables to make the following commands reusable.
+
+```bash
+export AWS_REGION=$(aws configure get region)    
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export BUCKET_NAME="sagemaker-projects-templates-${AWS_ACCOUNT_ID}-${AWS_REGION}"
+```
+
+```bash
+aws s3 mb s3://$BUCKET_NAME --region $AWS_REGION
+```
+
+#### Configure CORS Policy
+
+Create a CORS policy file (`cors-policy.json`):
+
+```json
+{
+    "CORSRules": [
+        {
+            "AllowedHeaders": [
+                "*"
+            ],
+            "AllowedMethods": [
+                "POST",
+                "PUT",
+                "GET",
+                "HEAD",
+                "DELETE"
+            ],
+            "AllowedOrigins": [
+                "https://*.sagemaker.aws"
+            ],
+            "ExposeHeaders": [
+                "ETag",
+                "x-amz-delete-marker",
+                "x-amz-id-2",
+                "x-amz-request-id",
+                "x-amz-server-side-encryption",
+                "x-amz-version-id"
+            ]
+        }
+    ]
+}
+```
+
+Apply the CORS policy:
+
+```bash
+aws s3api put-bucket-cors --bucket $BUCKET_NAME --cors-configuration file://cors-policy.json
+```
+
+### 6. Deploy Lambda Function
 
 This lambda will trigger the deploy GitHub action on model registry approval
 
@@ -208,7 +261,7 @@ chmod +x scripts/deploy-lambda.sh
 ./scripts/deploy-lambda.sh <BUCKET> <REGION> 
 ```
 
-### 6. GitHub Repository Setup
+### 7. GitHub Repository Setup
 
 #### Repository Structure
 Copy the contents of the `seedcode/` directory to the root of your GitHub repository:
