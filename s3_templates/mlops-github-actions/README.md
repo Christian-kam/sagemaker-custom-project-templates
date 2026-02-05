@@ -404,7 +404,7 @@ After creating the project:
    ```
 
 2. **Test the Pipeline:**
-   - Make changes to the `pipelines/` directory
+   - Make changes to the `pipelines/abalone/pipeline.py` file
    - Push to your GitHub repository
    - Verify the build workflow runs automatically
    - Approve a model in SageMaker Model Registry
