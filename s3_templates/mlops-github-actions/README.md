@@ -256,7 +256,6 @@ aws s3api put-bucket-cors --bucket $BUCKET_NAME --cors-configuration file://cors
 This lambda will trigger the deploy GitHub action on model registry approval
 
 ```bash
-# <BUCKET> example <sagemaker-*>
 # Make the script executable and run it
 chmod +x scripts/deploy-lambda.sh
 ./scripts/deploy-lambda.sh $BUCKET_NAME $AWS_REGION 
