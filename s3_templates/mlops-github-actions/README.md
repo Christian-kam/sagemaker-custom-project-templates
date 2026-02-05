@@ -322,9 +322,7 @@ aws sagemaker add-tags --resource-arn arn:aws:sagemaker:$AWS_REGION:$AWS_ACCOUNT
 
 ![](./images/domain-tag.png)
 
-### Method 1: Using SageMaker Studio
-
-## Template Parameters
+## Create the project with these template Parameters
 
 | Parameter | Description | Required | Default |
 |-----------|-------------|----------|---------|
@@ -337,6 +335,8 @@ aws sagemaker add-tags --resource-arn arn:aws:sagemaker:$AWS_REGION:$AWS_ACCOUNT
 | `GitHubWorkflowNameForDeployment` | Deployment workflow filename | Yes | deploy.yml |
 | `LambdaS3Bucket` | S3 bucket with Lambda function | Yes | - |
 | `LambdaS3Key` | Lambda function S3 key | Yes | lambda-github-workflow-trigger.zip |
+
+### Method 1: Using SageMaker Studio
 
 1. Open SageMaker Studio
 2. Navigate to **More** > **Projects** > **Create project**
