@@ -293,7 +293,8 @@ Add these secrets to your GitHub repository as follows:
 To create a manual approval step in our deployment pipelines, we use a [GitHub environment](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments). Complete the following steps:
 1. Go to your repository **Settings** > **Environments**
 2. Create environment named `production`
-3. Add required reviewers for deployment approval
+3. Add required reviewers for deployment approval. These are the people who can approve model deployment to production environment
+   ![](./images/reviewer.png)
 
 ## Template Deployment
 
@@ -326,6 +327,20 @@ aws sagemaker add-tags \
 ![](./images/domain-tag.png)
 
 ### Method 1: Using SageMaker Studio
+
+## Template Parameters
+
+| Parameter | Description | Required | Default |
+|-----------|-------------|----------|---------|
+| `SageMakerProjectName` | Name of the SageMaker project | Yes | - |
+| `Role ARN` | AmazonSageMakerProjectsLaunchRole (ARN) | Yes | - |
+| `CodeRepositoryName` | GitHub repository name | Yes | - |
+| `GitHubRepositoryOwnerName` | GitHub username or organization | Yes | - |
+| `CodestarConnectionUniqueId` | CodeConnection ID | Yes | - |
+| `GitHubTokenSecretName` | Secrets Manager secret name | Yes | - |
+| `GitHubWorkflowNameForDeployment` | Deployment workflow filename | Yes | deploy.yml |
+| `LambdaS3Bucket` | S3 bucket with Lambda function | Yes | - |
+| `LambdaS3Key` | Lambda function S3 key | Yes | lambda-github-workflow-trigger.zip |
 
 1. Open SageMaker Studio
 2. Navigate to **More** > **Projects** > **Create project**
@@ -374,20 +389,6 @@ response = sagemaker_client.create_project(
     }]
 )
 ```
-
-## Template Parameters
-
-| Parameter | Description | Required | Default |
-|-----------|-------------|----------|---------|
-| `SageMakerProjectName` | Name of the SageMaker project | Yes | - |
-| `CodeRepositoryName` | GitHub repository name | Yes | - |
-| `GitHubRepositoryOwnerName` | GitHub username/organization | Yes | - |
-| `CodestarConnectionUniqueId` | CodeConnection ID | Yes | - |
-| `GitHubTokenSecretName` | Secrets Manager secret name | Yes | - |
-| `GitHubWorkflowNameForDeployment` | Deployment workflow filename | Yes | deploy.yml |
-| `LambdaS3Bucket` | S3 bucket with Lambda function | Yes | - |
-| `LambdaS3Key` | Lambda function S3 key | Yes | lambda-github-workflow-trigger.zip |
-
 ## Post-Deployment Configuration
 
 After creating the project:
