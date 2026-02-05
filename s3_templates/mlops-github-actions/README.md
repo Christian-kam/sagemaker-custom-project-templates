@@ -83,7 +83,6 @@ Create a GitHub personal access token with access to **Contents** and **Actions*
 **then store it in AWS Secrets Manager.**
 
 ```bash
-# Store GitHub token in Secrets Manager
 aws secretsmanager create-secret \
     --name sagemaker-github-token \
     --description "GitHub token for SageMaker MLOps" \
@@ -94,18 +93,21 @@ aws secretsmanager create-secret \
 To allow GitHub Actions to deploy SageMaker endpoints in your AWS environment, you need to create an [AWS Identity and Access Management](https://aws.amazon.com/iam/) (IAM) user and grant it the necessary permissions. For instructions and best practices, refer to [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html). 
 Create an IAM user with the policy from [`iam/GithubActionsMLOpsExecutionPolicy.json`](./iam/GithubActionsMLOpsExecutionPolicy.json) and generate access keys for GitHub Secrets.
 ```bash
-# Create IAM user
 aws iam create-user --user-name sagemaker-github-actions-user
-
+```
+```bash
 aws iam create-policy \
     --policy-name SageMakerGitHubActionsPolicy \
     --policy-document file://iam/GithubActionsMLOpsExecutionPolicy.json
+```
 
+```bash
 aws iam attach-user-policy \
     --user-name sagemaker-github-actions-user \
     --policy-arn arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):policy/SageMakerGitHubActionsPolicy
+```
 
-# Create access keys
+```bash
 aws iam create-access-key --user-name sagemaker-github-actions-user
 ```
 
@@ -256,7 +258,6 @@ aws s3api put-bucket-cors --bucket $BUCKET_NAME --cors-configuration file://cors
 This lambda will trigger the deploy GitHub action on model registry approval
 
 ```bash
-# Make the script executable and run it
 chmod +x scripts/deploy-lambda.sh
 ./scripts/deploy-lambda.sh $BUCKET_NAME $AWS_REGION 
 ```
@@ -302,9 +303,7 @@ To create a manual approval step in our deployment pipelines, we use a [GitHub e
 
 1. **Upload template to S3:**
 ```bash
-# <BUCKET> example sagemaker-*
 aws s3 cp template.yaml s3://$BUCKET_NAME/templates/mlops-github-actions.yaml
-
 ```
 
 2. **Tag for SageMaker visibility:**
@@ -318,7 +317,6 @@ aws s3api put-object-tagging \
 
 3. **Configure SageMaker Domain:**
 ```bash
-# Tag your SageMaker domain with template location
 aws sagemaker add-tags \
     --resource-arn arn:aws:sagemaker:$AWS_REGION:$ACCOUNT_ID:domain/$DOMAIN-ID \
     --tags Key=sagemaker:projectS3TemplatesLocation,Value=s3://$BUCKET_NAME/templates/
