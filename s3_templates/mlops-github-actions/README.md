@@ -324,7 +324,7 @@ aws sagemaker add-tags --resource-arn arn:aws:sagemaker:$AWS_REGION:$AWS_ACCOUNT
 
 ![](./images/domain-tag.png)
 
-4. **Let SageMaker add CORS to your bucket** (optional if you did it in step [5](#configure-cors-policy)
+4. **Let SageMaker add CORS to your bucket** (optional if you did it in step [5](#configure-cors-policy))
 ![](./images/cors.png)
 
 ## Create the project with these template Parameters
