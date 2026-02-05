@@ -22,6 +22,15 @@ The template creates the following AWS resources:
 
 ## Prerequisites
 
+Set these environment variables to make the following commands reusable and easier to run.
+
+```bash
+export AWS_REGION=$(aws configure get region)    
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export BUCKET_NAME="sagemaker-projects-templates-${AWS_ACCOUNT_ID}-${AWS_REGION}"
+export 
+```
+
 ### 0. GitHub Repository Naming Requirement
 
 Your GitHub repository name **must start with `sagemaker-`** (e.g., `sagemaker-mlops-project`).
@@ -133,7 +142,7 @@ Lets identify the SageMaker Execution role of the SageMaker user profile.
 We intend to grant him permissions to deploy the provisioned custom template. Make sure to `<DOMAIN-ID>` with your actual SageMaker AI domain
 
 ```bash
-export SAGEMAKER_EXECUTION_ROLE_ARN=$(aws sagemaker describe-domain --domain-id <DOMAIN_ID> --query 'DefaultUserSettings.ExecutionRole' --output text)
+export SAGEMAKER_EXECUTION_ROLE_ARN=$(aws sagemaker describe-domain --domain-id $DOMAIN_ID --query 'DefaultUserSettings.ExecutionRole' --output text)
 ```
 
 ```bash
@@ -198,14 +207,6 @@ aws iam put-role-policy \
 
 ### 5. Create S3 Bucket
 
-Set these environment variables to make the following commands reusable.
-
-```bash
-export AWS_REGION=$(aws configure get region)    
-export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-export BUCKET_NAME="sagemaker-projects-templates-${AWS_ACCOUNT_ID}-${AWS_REGION}"
-```
-
 ```bash
 aws s3 mb s3://$BUCKET_NAME --region $AWS_REGION
 ```
@@ -258,7 +259,7 @@ This lambda will trigger the deploy GitHub action on model registry approval
 # <BUCKET> example <sagemaker-*>
 # Make the script executable and run it
 chmod +x scripts/deploy-lambda.sh
-./scripts/deploy-lambda.sh <BUCKET> <REGION> 
+./scripts/deploy-lambda.sh $BUCKET_NAME $AWS_REGION 
 ```
 
 ### 7. GitHub Repository Setup
@@ -299,18 +300,17 @@ To create a manual approval step in our deployment pipelines, we use a [GitHub e
 
 ### S3 Upload and Tagging
 
-
 1. **Upload template to S3:**
 ```bash
 # <BUCKET> example sagemaker-*
-aws s3 cp template.yaml s3://<BUCKET>/templates/mlops-github-actions.yaml
+aws s3 cp template.yaml s3://$BUCKET_NAME/templates/mlops-github-actions.yaml
 
 ```
 
 2. **Tag for SageMaker visibility:**
 ```bash
 aws s3api put-object-tagging \
-    --bucket <BUCKET> \
+    --bucket $BUCKET_NAME \
     --key mlops-github-actions/template.yaml \
     --tagging 'TagSet=[{Key=sagemaker:studio-visibility,Value=true}]'
 ```
@@ -320,8 +320,8 @@ aws s3api put-object-tagging \
 ```bash
 # Tag your SageMaker domain with template location
 aws sagemaker add-tags \
-    --resource-arn arn:aws:sagemaker:<REGION>:<ACCOUNT_ID>:domain/<DOMAIN-ID> \
-    --tags Key=sagemaker:projectS3TemplatesLocation,Value=s3://<BUCKET>/templates/
+    --resource-arn arn:aws:sagemaker:$AWS_REGION:$ACCOUNT_ID:domain/$DOMAIN-ID \
+    --tags Key=sagemaker:projectS3TemplatesLocation,Value=s3://$BUCKET_NAME/templates/
 ```
 
 ![](./images/domain-tag.png)
