@@ -339,7 +339,7 @@ aws sagemaker add-tags --resource-arn arn:aws:sagemaker:$AWS_REGION:$AWS_ACCOUNT
 | `CodestarConnectionUniqueId` | CodeConnection ID | Yes | - |
 | `GitHubTokenSecretName` | Secrets Manager secret name | Yes | - |
 | `GitHubWorkflowNameForDeployment` | Deployment workflow filename | Yes | deploy.yml |
-| `LambdaS3Bucket` | S3 bucket with Lambda function | Yes | - |
+| `LambdaS3Bucket` | Name of the S3 bucket with Lambda function (Not the S3 URI) | Yes | - |
 | `LambdaS3Key` | Lambda function S3 key | Yes | lambda-github-workflow-trigger.zip |
 
 ### Method 1: Using SageMaker Studio
