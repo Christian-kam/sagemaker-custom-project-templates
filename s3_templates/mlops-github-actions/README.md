@@ -360,11 +360,6 @@ This separation of responsibilities is important for maintaining security. Witho
 5. Fill in the project configuration details and choose Next. T
    ![](./images/project_details.png)
    
-The template will then create two automated ModelOps workflows—one for model building and one for model deployment—that work together to provide CI/CD for your ML models. 
-
-   ![](./images/sagemaker_pipeline.png)
-
-
 ### Method 2: Python SDK
 
 ```python
@@ -409,6 +404,10 @@ After creating the project:
    - Verify the build workflow runs automatically
    - Approve a model in SageMaker Model Registry
    - Verify the deployment workflow triggers
+   
+The template will then create two automated ModelOps workflows—one for model building and one for model deployment—that work together to provide CI/CD for your ML models. 
+
+   ![](./images/sagemaker_pipeline.png)
   
 ## Clean up
 After deployment, you will incur costs for the deployed resources. If you don’t intend to continue using the setup, delete the ModelOps project resources to avoid unnecessary charges.
