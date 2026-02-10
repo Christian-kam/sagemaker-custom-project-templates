@@ -25,8 +25,8 @@ The template creates the following AWS resources:
 Set these environment variables to make the following commands reusable and easier to run.
 
 ```bash
-export AWS_REGION=$(aws configure get region)    
-export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export AWS_REGION=<your AWS Region>
+export AWS_ACCOUNT_ID=<your AWS Account ID>
 export BUCKET_NAME="sagemaker-projects-templates-${AWS_ACCOUNT_ID}-${AWS_REGION}"
 export DOMAIN_ID="<your sagemaker domain>"
 ```
