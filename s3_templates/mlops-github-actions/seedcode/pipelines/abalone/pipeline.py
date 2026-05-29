@@ -31,6 +31,7 @@ from sagemaker.serve.model_builder import ModelBuilder
 from sagemaker.core.workflow.parameters import (
     ParameterInteger,
     ParameterString,
+    ParameterFloat,
 )
 from sagemaker.mlops.workflow.pipeline import Pipeline
 from sagemaker.mlops.workflow.steps import ProcessingStep, TrainingStep, CacheConfig
@@ -169,6 +170,12 @@ def get_pipeline(
         name="InputDataUrl",
         default_value=f"s3://sagemaker-servicecatalog-seedcode-{region}/dataset/abalone-dataset.csv",
     )
+    # XGBoost hyperparameters exposed as pipeline parameters so an agent (or a
+    # scheduled execution) can tune them at StartPipelineExecution time without
+    # changing code.
+    max_depth = ParameterInteger(name="MaxDepth", default_value=5)
+    eta = ParameterFloat(name="Eta", default_value=0.2)
+    num_round = ParameterInteger(name="NumRound", default_value=50)
 
     cache_config = CacheConfig(enable_caching=True, expire_after="30d")
 
@@ -264,9 +271,9 @@ def get_pipeline(
         ),
         hyperparameters={
             "objective": "reg:linear",
-            "num_round": 50,
-            "max_depth": 5,
-            "eta": 0.2,
+            "num_round": num_round,
+            "max_depth": max_depth,
+            "eta": eta,
             "gamma": 4,
             "min_child_weight": 7,
             "subsample": 0.7,
@@ -409,9 +416,11 @@ def get_pipeline(
         name=pipeline_name,
         parameters=[
             processing_instance_count,
-            training_instance_type,
             model_approval_status,
             input_data,
+            max_depth,
+            eta,
+            num_round,
         ],
         steps=[step_process, step_train, step_eval, step_cond],
         sagemaker_session=pipeline_session,
